@@ -21,11 +21,7 @@ import java.util.Map;
 public class GoFetch {
 
 	/**
-	 * Wrong command line error message.
-	 */
-	private static final String WRONG_COMMAND_LINE = "Wrong command line. Please specify a correct command line : ";
-	/**
-	 * Example of command line.
+	 * Command line example.
 	 */
 	private static final String ARG_EXAMPLE = "EXAMPLE : (java) GoFetch --url http://www.website.com/img[X].jpg --target C:/folder/a/ --range 1-6";
 
@@ -40,7 +36,7 @@ public class GoFetch {
 		TARGET("-t", "--target", "-t/--target		target argument, the value is a folder path on disk, required to write the files."),
 		RANGE("-r", "--range", "-r/--range		range argument, requires a specific syntax value 'n1:n2' where n1 and n2 are two positive integers >= 0 and n1 >= n2."),
 		HELP("-h", "--help", "-h/--help		help argument without value, will display the help of the program and shut it down."),
-		SIMULATION("-s", "--simul", "-s/--simul		simul argument, no value required. If present, the files will not really be downloaded or written to disk, it will fake everything for debug / demonstration purposes.");
+		SIMULATION("-s", "--simul", "-s/--simul		simul argument, no value required. If present, the files will not really be downloaded or written to disk, it will fake everything for debug/demonstration purposes.");
 
 		/**
 		 * The short version of the argument name.
@@ -93,7 +89,7 @@ public class GoFetch {
 	 */
 	public static void main(final String[] args) {
 		final Map<Argument, String> arguments = resolveCommandLine(args);
-		if (isCommandLineOK(arguments)) {
+		if (arguments != null) {
 			if(!arguments.containsKey(Argument.HELP)){
 				final List<String> urlList = buildUrlList(arguments);
 				if (urlList != null) {
@@ -111,9 +107,6 @@ public class GoFetch {
 			} else {
 				printHelp();
 			}
-		} else {
-			System.out.println(WRONG_COMMAND_LINE);
-			printHelp();
 		}
 	}
 
@@ -163,7 +156,7 @@ public class GoFetch {
 	private static Map<Argument, String> resolveCommandLine(final String[] args) {
 		Map<Argument, String> result = null;
 		if (args == null || args.length == 0) {
-			System.out.println(WRONG_COMMAND_LINE);
+			System.out.println("No arguments found on command line.");
 			printHelp();
 		} else {
 			result = new HashMap<Argument, String>();
@@ -178,10 +171,18 @@ public class GoFetch {
 						result.put(argument, (String) it.next());
 					}
 				} else {
-					System.out.println(WRONG_COMMAND_LINE);
+					System.out.println(String.format("This argument was not recognised : %s", arg));
 					printHelp();
 					result = null;
 					break;
+				}
+			}
+			if(result!=null){
+				if(!result.containsKey(Argument.HELP) 
+						&& (!result.containsKey(Argument.RANGE) || !result.containsKey(Argument.URL) || !result.containsKey(Argument.TARGET))){
+					System.out.println("Incorrect number of arguments. At least -r/--range, -u/--url, -t/--target must be used.");
+					printHelp();
+					result = null;
 				}
 			}
 		}
@@ -189,30 +190,14 @@ public class GoFetch {
 	}
 
 	/**
-	 * Checks that the command line is usable as parsed.
-	 * @param commandMap the map containing the arguments and their values.
-	 * @return true if the command line is usable as parsed.
-	 */
-	private static boolean isCommandLineOK(final Map<Argument, String> commandMap) {
-		boolean isCommandLineOK = true;
-		if(commandMap==null || commandMap.isEmpty()){
-			isCommandLineOK = false;
-		} else if(!commandMap.containsKey(Argument.HELP) && (commandMap.size()<3)){
-			isCommandLineOK = false;
-		} else if(!commandMap.containsKey(Argument.HELP) && !commandMap.containsKey(Argument.RANGE) 
-				&& !commandMap.containsKey(Argument.URL) && !commandMap.containsKey(Argument.TARGET)){
-			isCommandLineOK = false;
-		}
-		return isCommandLineOK;
-	}
-
-	/**
 	 * Prints out the help contents.
 	 */
 	private static void printHelp() {
+		System.out.println("\nHELP\n");
 		for (final Argument arg : Argument.values()) {
 			System.out.println(arg.getHelpLine());
 		}
+		System.out.println();
 		System.out.println(ARG_EXAMPLE);
 	}
 
