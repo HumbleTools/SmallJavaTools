@@ -1,3 +1,4 @@
+package com.humbletools.smalljavatools;
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
