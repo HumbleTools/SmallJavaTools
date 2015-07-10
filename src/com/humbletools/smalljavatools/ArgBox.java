@@ -1,7 +1,9 @@
 package com.humbletools.smalljavatools;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -118,9 +120,33 @@ public abstract class ArgBox {
 	}
 
 	public static Map<String, String> resolveCommandLine(final String... args) {
-		parsedArguments = new HashMap<String, String>();
-		// TODO
+		if ((args != null) && (args.length > 0)) {
+			parsedArguments = new HashMap<String, String>();
+			final Iterator<String> it = Arrays.asList(args).iterator();
+			while (it.hasNext()) {
+				final String arg = it.next();
+				final Argument argument = resolveArgument(arg);
+				if (argument != null) {
+					if (!argument.isValueNotRequired() && it.hasNext()) {
+						parsedArguments.put(argument.getArgName(), it.next());
+					} else {
+						parsedArguments.put(argument.getArgName(), null);
+					}
+				}
+			}
+		}
 		return parsedArguments;
+	}
+
+	private static Argument resolveArgument(final String arg) {
+		Argument result = null;
+		for (final Argument argument : registeredArguments) {
+			if (argument.getShortCall().equals(arg) || argument.getLongCall().equals(arg)) {
+				result = argument;
+				break;
+			}
+		}
+		return result;
 	}
 
 	public static void register(final String argName, final String shortCall, final String longCall, final String helpLine) {
