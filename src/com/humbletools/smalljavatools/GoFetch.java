@@ -61,7 +61,7 @@ public class GoFetch {
 		}
 
 		/**
-		 * Recolves a correct Argument enum value from it's string representation.
+		 * Resolves a correct Argument enum value from it's string representation.
 		 * @param argline the argument from the command line to be recognised.
 		 * @return the Argument enum value found, if a match was detected.
 		 */
